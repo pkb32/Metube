@@ -7,11 +7,54 @@ dotenv.config({
     path: './env'
 })
 
-connectDB();
+connectDB() //eeita gote promise return kariba
+.then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+        console.log(`Server is running on port ${process.env.PORT || 8000}`);
+    })
+})
+.catch((err) => {
+    console.log("MongoDB connection error",err);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 /* to directly connect the DB in the index.js file
+
+
 import express from "express";
 const app = express();
 
