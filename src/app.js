@@ -13,12 +13,21 @@ app.use(express.json({
 }));
 
 app.use(express.urlencoded({ //url ru data asile eeita handle kariba
-    extented: true,
+    extended: true,
     limit:"16kb"
 }));
 
 app.use(express.static("public")); //images wagera public folder re store kariba like img favicon etc
 
 app.use(cookieParser()); //to perform CRUD operations
+
+//routes import
+
+import userRouter from "./routes/user.routes.js";
+
+//routes declaration
+app.use("/api/v1/users", userRouter); //middlewares
+
+// http://localhost:8000/api/v1/users/register
 
 export {app};

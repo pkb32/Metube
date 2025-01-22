@@ -17,7 +17,7 @@ const xyz = () => { async () => {} } ame directly gote func as a parameter eei f
 } eeita gote way ame au gote kariba*/
 
 const asyncHandler = (requestHandler) =>{
-    (req,res,next) => {
+    return (req,res,next) => {
         Promise.resolve(requestHandler(req, res, next)).
         catch((err) => next(err))
     }
