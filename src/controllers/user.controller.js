@@ -305,10 +305,10 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
     .status(200)
-    .json(
+    .json( 
         new ApiResponse(
             200,
-            re.user,
+            req.user,
             "Current user data fetched successfully"
         )
     )
@@ -322,7 +322,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Please provide all fields");
     }
 
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set:{
@@ -359,6 +359,9 @@ const upadateUserAvatar = asyncHandler(async (req, res) => {
     if (!avatar.url) {
         throw new ApiError(400, "Avatar upload failed");
     }
+    
+    const oldAvatarData = await User.findById(req.user?._id).select("avatar");
+    const oldAvatarUrl = oldAvatarData?.avatar;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -374,6 +377,16 @@ const upadateUserAvatar = asyncHandler(async (req, res) => {
 
     ).select("-password")
 
+    //DELETE OLD AVATAR
+    if (oldAvatarUrl) {
+        const publicId = oldAvatarUrl.split('/').pop().split('.')[0]; // Extract the public ID
+        try {
+            await cloudinary.uploader.destroy(publicId); // Delete the old avatar
+        } catch (error) {
+            throw new ApiError(500, "Failed to delete old avatar from Cloudinary");
+        }
+    }
+
     return res
     .status(200)
     .json(
@@ -383,6 +396,8 @@ const upadateUserAvatar = asyncHandler(async (req, res) => {
             "Avatar updated successfully"
         )
     )
+
+
 });
 
 const updateUserCoverImage = asyncHandler(async(req, res) => {
