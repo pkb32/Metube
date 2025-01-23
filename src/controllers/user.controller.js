@@ -379,7 +379,7 @@ const upadateUserAvatar = asyncHandler(async (req, res) => {
 
     //DELETE OLD AVATAR
     if (oldAvatarUrl) {
-        const publicId = oldAvatarUrl.split('/').pop().split('.')[0]; // Extract the public ID
+        const publicId = oldAvatarUrl.split('/').pop().split('.')[0]; // Extract the public ID from cloudinary
         try {
             await cloudinary.uploader.destroy(publicId); // Delete the old avatar
         } catch (error) {
@@ -519,6 +519,67 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 })
 
 
+//21st vdo - watch history
+
+const getWatchHistory = asyncHandler(async(req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup: {
+                from: "videos", 
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields:{
+                            owner:{
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user[0].watchHistory,
+            "Watch history fetched successfully"
+        )
+    )
+})
+
+
+
+
+
+
 export { 
     registerUser ,
     loginUser,
@@ -529,7 +590,7 @@ export {
     updateAccountDetails,
     upadateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
-    
+    getUserChannelProfile,
+    getWatchHistory
     
 };
