@@ -4,7 +4,7 @@ import {ApiError} from "../utils/ApiError.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-
+import { v2 as cloudinary } from 'cloudinary';
 
 const generateAccessAndRefereshTokens = async(userId) =>{
     try {
