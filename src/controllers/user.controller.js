@@ -198,8 +198,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id, 
         {
-            $set:{
-                refreshToken: undefined
+            $unset:{
+                refreshToken: 1 //this removes the field from document
             }
         },
         {
@@ -345,7 +345,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 })
 
-const upadateUserAvatar = asyncHandler(async (req, res) => {
+const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
     if (!avatarLocalPath) {
 
@@ -588,7 +588,7 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
-    upadateUserAvatar,
+    updateUserAvatar,
     updateUserCoverImage,
     getUserChannelProfile,
     getWatchHistory
